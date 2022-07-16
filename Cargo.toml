@@ -1,0 +1,19 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name = "syndey"
+version = "0.1.0"
+authors = ["Fuwn <contact@fuwn.me>"]
+edition = "2021"
+description = "Vim-like, Command-line Gemini Client"
+readme = "README.md"
+homepage = "https://github.com/gemrest/sydney"
+repository = "https://github.com/gemrest/sydney"
+license = "GPL-3.0-only"
+keywords = ["gemini", "client"]
+
+[dependencies]
+germ = { version = "0.3.3", default-features = false, features = ["request", "ast"] } # Gemini
+url = "2.2.2" # URL
+tui = "0.18.0" # Terminal User Interface
+crossterm = "0.24.0" # Cross-platform Terminal
