@@ -121,6 +121,8 @@ fn handle_normal_input(
       },
     KeyCode::Backspace => app.error = None,
     KeyCode::Enter => {
+      app.error = None;
+
       if let Some(link) = &app.items.items[app.items.selected].1 {
         if !link.starts_with("gemini://") && link.contains("://") {
         } else {
