@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [package]
-name = "syndey"
+name = "sydney"
 version = "0.1.0"
 authors = ["Fuwn <contact@fuwn.me>"]
 edition = "2021"
