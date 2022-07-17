@@ -140,8 +140,6 @@ impl App {
           } else if response.status() != &Status::Input
             && response.status() != &Status::SensitiveInput
           {
-            items.push((vec![response.meta().to_string()], None));
-
             self.error = Some(response.meta().to_string());
           }
 
