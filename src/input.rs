@@ -128,7 +128,13 @@ fn handle_normal_input(
         if !link.starts_with("gemini://") && link.contains("://") {
         } else {
           let the_url = &if link.starts_with('/') {
-            format!("gemini://{}{}", app.url.host_str().unwrap(), link)
+            if let Some(host) = app.url.host_str() {
+              format!("gemini://{}{}", host, link)
+            } else {
+              app.error = Some("URL has no host".to_string());
+
+              return false
+            }
           } else if link.starts_with("gemini://") {
             link.to_string()
           } else if !link.starts_with('/') && !link.starts_with("gemini://") {
