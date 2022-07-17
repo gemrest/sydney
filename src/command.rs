@@ -20,6 +20,7 @@ pub enum Command {
   Open(Option<String>),
   Unknown,
   Wrap(u16, Option<String>),
+  Help,
 }
 impl From<String> for Command {
   fn from(s: String) -> Self {
@@ -51,6 +52,7 @@ impl From<String> for Command {
             }
           },
         ),
+      Some("help" | "h") => Self::Help,
       _ => Self::Unknown,
     }
   }

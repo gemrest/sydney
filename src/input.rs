@@ -170,7 +170,6 @@ fn handle_editing_input(
               })
               .unwrap(),
             );
-
             app.make_request();
           } else {
             app.error = Some("No URL provided for open command".to_string());
@@ -187,6 +186,10 @@ fn handle_editing_input(
 
             app.make_request();
           },
+        Command::Help => {
+          app.set_url(Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap());
+          app.make_request();
+        }
       }
 
       app.input_mode = Mode::Normal;
