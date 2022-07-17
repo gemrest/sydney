@@ -20,6 +20,7 @@ use url::Url;
 
 use crate::command::Command;
 
+#[derive(PartialEq)]
 pub enum Mode {
   Normal,
   Editing,
@@ -83,8 +84,6 @@ fn handle_normal_input(
 ) -> bool {
   match key.code {
     KeyCode::Char(':') => {
-      app.input.push(':');
-
       app.input_mode = Mode::Editing;
       app.error = None;
     }
@@ -153,24 +152,14 @@ fn handle_editing_input(
 ) -> bool {
   match key.code {
     KeyCode::Enter => {
-      if let Some(command) = app.input.get(1..) {
-        app.command_history.reverse();
-        app.command_history.push(command.to_string());
-        app.command_history.reverse();
-      }
+      app.command_history.reverse();
+      app.command_history.push(app.input.to_string());
+      app.command_history.reverse();
 
-      match Command::from(
-        app.input.to_string().get(1..).unwrap_or("").to_string(),
-      ) {
+      match Command::from(app.input.to_string()) {
         Command::Quit => return true,
-        Command::Open(to) => {
+        Command::Open(to) =>
           if let Some(to) = to {
-            // Remove colon
-            app.input = app.input.chars().rev().collect();
-
-            app.input.pop();
-
-            app.input = app.input.chars().rev().collect();
             app.set_url(
               Url::parse(&if to.starts_with("gemini://") {
                 to
@@ -183,17 +172,10 @@ fn handle_editing_input(
             app.make_request();
           } else {
             app.error = Some("No URL provided for open command".to_string());
-          }
-        }
-        Command::Unknown =>
-          if app.input == ":" {
-            app.input_mode = Mode::Normal;
-          } else {
-            app.error = Some(format!(
-              "\"{}\" is not a valid command",
-              app.input.to_string().get(1..).unwrap_or("")
-            ));
           },
+        Command::Unknown => {
+          app.error = Some(format!("\"{}\" is not a valid command", app.input));
+        }
         Command::Wrap(at, error) =>
           if let Some(error) = error {
             app.error = Some(error);
@@ -214,7 +196,7 @@ fn handle_editing_input(
     KeyCode::Up => {
       if let Some(command) = app.command_history.get(app.command_history_cursor)
       {
-        app.input = format!(":{}", command);
+        app.input = command.to_string();
 
         if app.command_history_cursor + 1 < app.command_history.len() {
           app.command_history_cursor += 1;
@@ -232,11 +214,11 @@ fn handle_editing_input(
 
       if let Some(command) = app.command_history.get(app.command_history_cursor)
       {
-        app.input = format!(":{}", command);
+        app.input = command.to_string();
       }
 
       if dead_set {
-        app.input = ":".to_string();
+        app.input.clear();
       }
     }
     KeyCode::Backspace => {
