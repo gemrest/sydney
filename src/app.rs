@@ -111,7 +111,7 @@ impl App {
             items = self.items.items.clone();
           }
 
-          items.push((vec![format!("{}", response.meta().to_string())], None));
+          items.push((vec![response.meta().to_string()], None));
           items.push((vec!["".to_string()], None));
 
           if let Some(content) = response.content().clone() {

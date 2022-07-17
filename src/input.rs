@@ -184,6 +184,8 @@ fn handle_editing_input(
           } else {
             app.error = None;
             app.wrap_at = at;
+
+            app.make_request();
           },
       }
 
