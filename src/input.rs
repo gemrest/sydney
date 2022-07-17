@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crossterm::event::KeyCode;
-use url::Url;
+use url::{Url};
 
 use crate::command::Command;
 
@@ -162,15 +162,18 @@ fn handle_editing_input(
         Command::Quit => return true,
         Command::Open(to) =>
           if let Some(to) = to {
-            app.set_url(
-              Url::parse(&if to.starts_with("gemini://") {
-                to
-              } else {
-                format!("gemini://{}", to)
-              })
-              .unwrap(),
-            );
-            app.make_request();
+            match
+            Url::parse(&if to.starts_with("gemini://") {
+              to
+            } else {
+              format!("gemini://{}", to)
+            }) {
+              Ok(url) => {
+                app.set_url(url);
+                app.make_request();
+              }
+              Err(error) => app.error = Some(error.to_string()),
+            }
           } else {
             app.error = Some("No URL provided for open command".to_string());
           },
