@@ -19,7 +19,7 @@ pub enum Command {
   Quit,
   Open(Option<String>),
   Unknown,
-  Wrap(usize, Option<String>),
+  Wrap(u16, Option<String>),
 }
 impl From<String> for Command {
   fn from(s: String) -> Self {
