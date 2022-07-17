@@ -37,7 +37,7 @@ pub struct App {
   pub response_input:         String,
   pub accept_response_input:  bool,
   pub response_input_text:    String,
-  pub wrap_at:                usize,
+  pub wrap_at:                u16,
 }
 impl App {
   pub fn new() -> Self {
@@ -57,7 +57,7 @@ impl App {
       previous_capsule: None,
       accept_response_input: false,
       response_input_text: "".to_string(),
-      wrap_at: 80,
+      wrap_at: crossterm::terminal::size().unwrap_or((80, 24)).0,
     };
 
     app.make_request();
@@ -123,7 +123,7 @@ impl App {
               } else {
                 line
                   .as_bytes()
-                  .chunks(self.wrap_at)
+                  .chunks(self.wrap_at as usize)
                   .map(|buf| {
                     #[allow(unsafe_code)]
                     unsafe { std::str::from_utf8_unchecked(buf) }.to_string()
