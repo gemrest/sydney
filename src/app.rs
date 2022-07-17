@@ -41,7 +41,7 @@ pub struct App {
 }
 impl App {
   pub fn new() -> Self {
-    let url = Url::parse("gemini://gemini.circumlunar.space/").unwrap();
+    let url = Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap();
 
     let mut app = Self {
       response_input: String::new(),
