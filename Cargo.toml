@@ -2,7 +2,7 @@
 
 [package]
 name = "sydney"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Fuwn <contact@fuwn.me>"]
 edition = "2021"
 description = "Vim-like, Command-line Gemini Client"
@@ -11,6 +11,12 @@ homepage = "https://github.com/gemrest/sydney"
 repository = "https://github.com/gemrest/sydney"
 license = "GPL-3.0-only"
 keywords = ["gemini", "client"]
+
+# Slower builds, faster executables
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
 
 [dependencies]
 germ = { version = "0.3.3", default-features = false, features = ["request", "ast"] } # Gemini
