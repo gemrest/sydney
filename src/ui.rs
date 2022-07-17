@@ -72,8 +72,10 @@ pub fn ui<B: tui::backend::Backend>(
       Paragraph::new(&**error).style(Style::default().bg(Color::Red)),
       chunks[2],
     );
-  } else if !app.input.is_empty() {
-    f.render_widget(Paragraph::new(&*app.input), chunks[2]);
+  } else if !app.input.is_empty()
+    || app.input_mode == crate::input::Mode::Editing
+  {
+    f.render_widget(Paragraph::new(format!(":{}", app.input)), chunks[2]);
   }
 
   if app.accept_response_input {
