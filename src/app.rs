@@ -108,6 +108,7 @@ impl App {
           {
             self.accept_response_input = true;
             self.response_input_text = response.meta().to_string();
+            items = self.items.items.clone();
           }
 
           items.push((vec![format!("{}", response.meta().to_string())], None));
