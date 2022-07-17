@@ -38,7 +38,15 @@ impl From<String> for Command {
           },
           |at| {
             match at.parse() {
-              Ok(at_parsed) => Self::Wrap(at_parsed, None),
+              Ok(at_parsed) =>
+                Self::Wrap(
+                  if at_parsed == 0 {
+                    crossterm::terminal::size().unwrap_or((80, 24)).0
+                  } else {
+                    at_parsed
+                  },
+                  None,
+                ),
               Err(error) => Self::Wrap(80, Some(error.to_string())),
             }
           },
