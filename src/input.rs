@@ -84,6 +84,8 @@ fn handle_normal_input(
 ) -> bool {
   match key.code {
     KeyCode::Char(':') => {
+      app.input.clear();
+
       app.input_mode = Mode::Editing;
       app.error = None;
     }
@@ -187,8 +189,6 @@ fn handle_editing_input(
 
       app.input_mode = Mode::Normal;
       app.command_history_cursor = 0;
-
-      app.input.clear();
     }
     KeyCode::Char(c) => {
       app.input.push(c);
