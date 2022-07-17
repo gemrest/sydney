@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crossterm::event::KeyCode;
-use url::{Url};
+use url::Url;
 
 use crate::command::Command;
 
@@ -133,7 +133,7 @@ fn handle_normal_input(
             } else {
               app.error = Some("URL has no host".to_string());
 
-              return false
+              return false;
             }
           } else if link.starts_with("gemini://") {
             link.to_string()
@@ -143,8 +143,13 @@ fn handle_normal_input(
             app.url.to_string()
           };
 
-          app.set_url(Url::parse(the_url).unwrap());
-          app.make_request();
+          match Url::parse(the_url) {
+            Ok(the_actual_url) => {
+              app.set_url(the_actual_url);
+              app.make_request();
+            }
+            Err(error) => app.error = Some(error.to_string()),
+          }
         }
       }
     }
@@ -168,8 +173,7 @@ fn handle_editing_input(
         Command::Quit => return true,
         Command::Open(to) =>
           if let Some(to) = to {
-            match
-            Url::parse(&if to.starts_with("gemini://") {
+            match Url::parse(&if to.starts_with("gemini://") {
               to
             } else {
               format!("gemini://{}", to)
@@ -196,7 +200,9 @@ fn handle_editing_input(
             app.make_request();
           },
         Command::Help => {
-          app.set_url(Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap());
+          app.set_url(
+            Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap(),
+          );
           app.make_request();
         }
       }
