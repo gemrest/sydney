@@ -110,6 +110,9 @@ impl App {
             self.response_input_text = response.meta().to_string();
           }
 
+          items.push((vec![format!("{}", response.meta().to_string())], None));
+          items.push((vec!["".to_string()], None));
+
           if let Some(content) = response.content().clone() {
             for line in content.lines().clone() {
               let line = line.replace('\t', " ");
