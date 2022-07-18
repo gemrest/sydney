@@ -2,7 +2,7 @@
 
 [package]
 name = "sydney"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Fuwn <contact@fuwn.me>"]
 edition = "2021"
 description = "Vim-like, Command-line Gemini Client"

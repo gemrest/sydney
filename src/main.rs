@@ -84,6 +84,8 @@ Report bugs to https://github.com/gemrest/sydney/issues"#,
   ) {
     Ok(response) =>
       if let Some(content) = response.content() {
+        let content = content.trim();
+
         if content > &String::from(env!("CARGO_PKG_VERSION")) {
           app.error = Some(format!(
             "Your Sydney version ({}) is outdated. It is recommended that you \
