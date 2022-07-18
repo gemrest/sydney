@@ -79,6 +79,33 @@ Report bugs to https://github.com/gemrest/sydney/issues"#,
 
   let mut stdout = std::io::stdout();
 
+  match germ::request::request(
+    &url::Url::parse("gemini://fuwn.me/api/sydney/version").unwrap(),
+  ) {
+    Ok(response) =>
+      if let Some(content) = response.content() {
+        if content > &String::from(env!("CARGO_PKG_VERSION")) {
+          app.error = Some(format!(
+            "Your Sydney version ({}) is outdated. It is recommended that you \
+             update to the newest version ({}).",
+            env!("CARGO_PKG_VERSION"),
+            content,
+          ));
+        }
+      } else {
+        app.error = Some(
+          "Could not check if Sydney has a newer version because the response \
+           had no content. Please try again later."
+            .to_string(),
+        );
+      },
+    Err(error) =>
+      app.error = Some(format!(
+        "Could not check if Sydney has a newer version: {}",
+        error
+      )),
+  }
+
   execute!(
     stdout,
     terminal::EnterAlternateScreen,
