@@ -5,7 +5,7 @@
 
 Sydney is a Vim-like, command-line Gemini client.
 
-[![GIF of Sydney in action](https://host.fuwn.me/3k5cmvhf24dx.gif)](https://host.fuwn.me/c2uvq9mqiccc.gif)
+[![GIF of Sydney in action](https://host.fuwn.me/m3q9cny6pr5f.png)](https://host.fuwn.me/m3q9cny6pr5f.png)
 
 Sydney has a beautiful, intuitive, and powerful command-line interface;
 including:

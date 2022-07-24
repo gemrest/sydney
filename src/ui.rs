@@ -139,14 +139,10 @@ pub fn ui<B: tui::backend::Backend>(
             text,
             alt_text,
           } => {
-            let mut span_list = vec![];
-
-            span_list.push(Span::styled(
-              "``` ",
-              Style::default().fg(Color::LightBlue),
-            ));
-            span_list
-              .push(Span::from(alt_text.unwrap_or_else(|| "".to_string())));
+            let mut span_list = vec![
+              Span::styled("``` ", Style::default().fg(Color::LightBlue)),
+              Span::from(alt_text.unwrap_or_else(|| "".to_string())),
+            ];
 
             if text != "sydney_abc_123" {
               span_list.push(Span::from(text));

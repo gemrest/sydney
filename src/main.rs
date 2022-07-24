@@ -26,7 +26,6 @@
   clippy::nursery,
   clippy::pedantic
 )]
-#![feature(iter_advance_by)]
 #![recursion_limit = "128"]
 
 mod app;
