@@ -2,7 +2,7 @@
 
 [package]
 name = "sydney"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Fuwn <contact@fuwn.me>"]
 edition = "2021"
 description = "Vim-like, Command-line Gemini Client"
@@ -19,7 +19,7 @@ codegen-units = 1
 opt-level = 3
 
 [dependencies]
-germ = { version = "0.3.3", default-features = false, features = ["request", "ast"] } # Gemini
+germ = { version = "0.3.7", default-features = false, features = ["request", "ast"] } # Gemini
 url = "2.2.2" # URL
 tui = "0.18.0" # Terminal User Interface
 crossterm = "0.24.0" # Cross-platform Terminal

@@ -18,13 +18,13 @@
 use std::time::{Duration, Instant};
 
 use crossterm::event;
-use germ::request::Status;
+use germ::{ast::Node, request::Status};
 use url::Url;
 
 use crate::{input::Mode as InputMode, stateful_list::StatefulList};
 
 pub struct App {
-  pub items:                  StatefulList<(Vec<String>, Option<String>)>,
+  pub items:                  StatefulList<(Vec<Node>, Option<String>, bool)>,
   pub input:                  String,
   pub input_mode:             InputMode,
   pub command_stroke_history: Vec<event::KeyCode>,
@@ -72,7 +72,7 @@ impl App {
 
   pub fn make_request(&mut self) {
     self.items = StatefulList::with_items({
-      let mut items = vec![];
+      let mut items: Vec<(Vec<Node>, Option<String>, bool)> = vec![];
 
       match germ::request::request(&self.url) {
         Ok(mut response) => {
@@ -111,30 +111,50 @@ impl App {
             items = self.items.items.clone();
           }
 
-          items.push((vec![response.meta().to_string()], None));
-          items.push((vec!["".to_string()], None));
+          // items.push((
+          //   vec![Node::Text(response.meta().to_string())],
+          //   None,
+          //   false,
+          // ));
+          // items.push((vec![Node::Text("".to_string())], None, false));
+
+          let mut pre = false;
 
           if let Some(content) = response.content().clone() {
-            for line in content.lines().clone() {
+            let real_lines = content.lines();
+
+            for line in real_lines {
               let line = line.replace('\t', " ");
-              let mut parts = line.split_whitespace();
-              let lines = if line.is_empty() {
-                vec![line.to_string()]
+              let pre_like = if line.starts_with("```") {
+                pre = !pre;
+
+                true
               } else {
-                line
-                  .as_bytes()
-                  .chunks(self.wrap_at as usize)
-                  .map(|buf| {
-                    #[allow(unsafe_code)]
-                    unsafe { std::str::from_utf8_unchecked(buf) }.to_string()
-                  })
-                  .collect::<Vec<_>>()
+                false
               };
 
+              let ast = germ::ast::Ast::from_string(&line);
+              let ast_node = ast.inner().first().map_or_else(
+                || {
+                  if pre_like || pre {
+                    if line == "```" {
+                      Node::Text("sydney_abc_123".to_string())
+                    } else {
+                      Node::Text(line.get(3..).unwrap_or("").to_string())
+                    }
+                  } else {
+                    Node::Whitespace
+                  }
+                },
+                Clone::clone,
+              );
+
+              let mut parts = line.split_whitespace();
+
               if let (Some("=>"), Some(to)) = (parts.next(), parts.next()) {
-                items.push((lines, Some(to.to_string())));
+                items.push((vec![ast_node], Some(to.to_string()), false));
               } else {
-                items.push((lines, None));
+                items.push((vec![ast_node], None, pre));
               }
             }
           } else if response.status() != &Status::Input

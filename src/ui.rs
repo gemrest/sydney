@@ -15,13 +15,16 @@
 // Copyright (C) 2022-2022 Fuwn <contact@fuwn.me>
 // SPDX-License-Identifier: GPL-3.0-only
 
+use germ::ast::Node;
 use tui::{
   layout::{Constraint, Direction, Layout, Rect},
-  style::{Color, Style},
+  style::{Color, Modifier, Style},
+  text::{Span, Spans},
   widgets,
   widgets::{ListItem, Paragraph},
 };
 
+#[allow(clippy::too_many_lines)]
 pub fn ui<B: tui::backend::Backend>(
   f: &mut tui::Frame<'_, B>,
   app: &mut crate::App,
@@ -42,11 +45,119 @@ pub fn ui<B: tui::backend::Backend>(
     .items
     .items
     .iter()
-    .map(|(text_lines, _link)| {
+    .map(|(text_lines, _link, pre)| {
       let mut spans = vec![];
 
       for line in text_lines {
-        spans.push(tui::text::Spans::from(line.as_str()));
+        let mut line = line.clone();
+
+        if *pre {
+          if let Node::Text(text) = line {
+            line = Node::PreformattedText {
+              alt_text: None,
+              text:     text.to_string(),
+            }
+          }
+        }
+
+        match line {
+          germ::ast::Node::Text(text) =>
+            if text != "sydney_abc_123" {
+              spans.push(tui::text::Spans::from(format!("    {}", text)));
+            },
+          germ::ast::Node::Blockquote(text) => {
+            spans.push(Spans::from(vec![
+              Span::styled("  > ", Style::default().fg(Color::LightBlue)),
+              Span::styled(
+                text,
+                Style::default().add_modifier(Modifier::ITALIC),
+              ),
+            ]));
+          }
+          germ::ast::Node::Link {
+            to,
+            text,
+          } => {
+            let mut span_list =
+              vec![Span::styled(" => ", Style::default().fg(Color::LightBlue))];
+
+            span_list.push(Span::styled(
+              text.unwrap_or_else(|| to.clone()),
+              Style::default().add_modifier(Modifier::UNDERLINED),
+            ));
+            span_list.push(Span::from(" "));
+            span_list
+              .push(Span::styled(to, Style::default().fg(Color::LightBlue)));
+
+            spans.push(Spans::from(span_list));
+          }
+          germ::ast::Node::Heading {
+            text,
+            level,
+          } => {
+            spans.push(Spans::from(vec![
+              Span::styled(
+                match level {
+                  1 => "  # ",
+                  2 => " ## ",
+                  3 => "### ",
+                  _ => unreachable!(),
+                },
+                Style::default().fg(Color::LightBlue),
+              ),
+              Span::styled(text, {
+                let mut style = Style::default().add_modifier(Modifier::BOLD);
+
+                match level {
+                  1 => {
+                    style = style.add_modifier(Modifier::UNDERLINED);
+                  }
+                  3 => {
+                    style = style.add_modifier(Modifier::ITALIC);
+                  }
+                  _ => {}
+                }
+
+                style
+              }),
+            ]));
+          }
+          germ::ast::Node::List(list_items) => {
+            let mut span_list = vec![];
+
+            for list_item in list_items {
+              span_list.push(Span::styled(
+                "  * ",
+                Style::default().fg(Color::LightBlue),
+              ));
+              span_list.push(Span::from(format!("{}\n", list_item)));
+            }
+
+            spans.push(Spans::from(span_list));
+          }
+          germ::ast::Node::PreformattedText {
+            text,
+            alt_text,
+          } => {
+            let mut span_list = vec![];
+
+            span_list.push(Span::styled(
+              "``` ",
+              Style::default().fg(Color::LightBlue),
+            ));
+            span_list
+              .push(Span::from(alt_text.unwrap_or_else(|| "".to_string())));
+
+            if text != "sydney_abc_123" {
+              span_list.push(Span::from(text));
+            }
+
+            spans.push(Spans::from(span_list));
+          }
+          germ::ast::Node::Whitespace => {
+            spans.push(Spans::from("".to_string()));
+          }
+        };
       }
 
       ListItem::new(spans)
@@ -54,7 +165,12 @@ pub fn ui<B: tui::backend::Backend>(
     .collect();
 
   let items = widgets::List::new(items)
-    .highlight_style(Style::default().bg(Color::White).fg(Color::Black))
+    .highlight_style(
+      Style::default()
+        .bg(Color::White)
+        .fg(Color::Black)
+        .remove_modifier(Modifier::BOLD),
+    )
     .style(Style::default().bg(Color::Black).fg(Color::White));
 
   f.render_stateful_widget(items, chunks[0], &mut app.items.state);

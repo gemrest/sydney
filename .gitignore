@@ -4,3 +4,7 @@ Cargo.lock
 
 # CLion
 .idea
+
+# Visual Studio Code
+.vscode
+

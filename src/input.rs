@@ -20,7 +20,7 @@ use url::Url;
 
 use crate::command::Command;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Mode {
   Normal,
   Editing,
