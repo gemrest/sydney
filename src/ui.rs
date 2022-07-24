@@ -53,12 +53,9 @@ pub fn ui<B: tui::backend::Backend>(
     })
     .collect();
 
-  let items = widgets::List::new(items).highlight_style(
-    Style::default()
-      .bg(Color::White)
-      .fg(Color::Black)
-      .add_modifier(tui::style::Modifier::BOLD),
-  );
+  let items = widgets::List::new(items)
+    .highlight_style(Style::default().bg(Color::White).fg(Color::Black))
+    .style(Style::default().bg(Color::Black).fg(Color::White));
 
   f.render_stateful_widget(items, chunks[0], &mut app.items.state);
   f.render_widget(
