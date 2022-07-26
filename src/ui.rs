@@ -73,10 +73,10 @@ pub fn ui<B: tui::backend::Backend>(
 
             for (i, wrapped) in wrappeds.iter().enumerate() {
               $spans.push(Spans::from(format!("    {}{}", wrapped, {
-                if i == wrappeds.len() - 1 && wrappeds.len() != 1 {
-                  ""
-                } else {
+                if i < wrappeds.len() - 1 && wrappeds.len() != 1 {
                   "-"
+                } else {
+                  ""
                 }
               })));
             }
@@ -89,13 +89,30 @@ pub fn ui<B: tui::backend::Backend>(
               wrap_split!(text, spans);
             },
           germ::ast::Node::Blockquote(text) => {
-            spans.push(Spans::from(vec![
-              Span::styled("  > ", Style::default().fg(Color::LightBlue)),
-              Span::styled(
-                text,
-                Style::default().add_modifier(Modifier::ITALIC),
-              ),
-            ]));
+            let wrappeds = text
+              .as_bytes()
+              .chunks((app.wrap_at as usize) - 5)
+              .map(|buf| {
+                #[allow(unsafe_code)]
+                unsafe { std::str::from_utf8_unchecked(buf) }.to_string()
+              })
+              .collect::<Vec<_>>();
+
+            for (i, wrapped) in wrappeds.iter().enumerate() {
+              spans.push(Spans::from(vec![
+                Span::styled("  > ", Style::default().fg(Color::LightBlue)),
+                Span::styled(
+                  format!("{}{}", wrapped.clone(), {
+                    if i < wrappeds.len() && wrappeds.len() != 1 {
+                      "-"
+                    } else {
+                      ""
+                    }
+                  }),
+                  Style::default().add_modifier(Modifier::ITALIC),
+                ),
+              ]));
+            }
           }
           germ::ast::Node::Link {
             to,
