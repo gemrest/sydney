@@ -60,10 +60,33 @@ pub fn ui<B: tui::backend::Backend>(
           }
         }
 
+        macro_rules! wrap_split {
+          ($text:ident, $spans:ident) => {
+            let wrappeds = $text
+              .as_bytes()
+              .chunks((app.wrap_at as usize) - 5)
+              .map(|buf| {
+                #[allow(unsafe_code)]
+                unsafe { std::str::from_utf8_unchecked(buf) }.to_string()
+              })
+              .collect::<Vec<_>>();
+
+            for (i, wrapped) in wrappeds.iter().enumerate() {
+              $spans.push(Spans::from(format!("    {}{}", wrapped, {
+                if i == wrappeds.len() - 1 && wrappeds.len() != 1 {
+                  ""
+                } else {
+                  "-"
+                }
+              })));
+            }
+          };
+        }
+
         match line {
           germ::ast::Node::Text(text) =>
             if text != "sydney_abc_123" {
-              spans.push(tui::text::Spans::from(format!("    {}", text)));
+              wrap_split!(text, spans);
             },
           germ::ast::Node::Blockquote(text) => {
             spans.push(Spans::from(vec![
