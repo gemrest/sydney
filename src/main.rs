@@ -33,7 +33,9 @@ mod command;
 mod input;
 mod stateful_list;
 mod ui;
+mod url;
 
+use ::url::Url;
 use app::App;
 use crossterm::{event, execute, terminal};
 
@@ -68,7 +70,7 @@ Report bugs to https://github.com/gemrest/sydney/issues"#,
         return Ok(());
       }
       _ => {
-        app.url = url::Url::parse(&arg)?;
+        app.url = Url::parse(&url::prefix_gemini(&arg))?;
 
         app.make_request();
       }
@@ -80,7 +82,7 @@ Report bugs to https://github.com/gemrest/sydney/issues"#,
   let mut stdout = std::io::stdout();
 
   match germ::request::request(
-    &url::Url::parse("gemini://fuwn.me/api/sydney/version").unwrap(),
+    &Url::parse("gemini://fuwn.me/api/sydney/version").unwrap(),
   ) {
     Ok(response) =>
       if let Some(content) = response.content() {

@@ -173,11 +173,7 @@ fn handle_editing_input(
         Command::Quit => return true,
         Command::Open(to) =>
           if let Some(to) = to {
-            match Url::parse(&if to.starts_with("gemini://") {
-              to
-            } else {
-              format!("gemini://{}", to)
-            }) {
+            match Url::parse(&crate::url::prefix_gemini(&to)) {
               Ok(url) => {
                 app.set_url(url);
                 app.make_request();
