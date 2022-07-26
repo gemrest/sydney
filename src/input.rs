@@ -89,6 +89,9 @@ fn handle_normal_input(
       app.input_mode = Mode::Editing;
       app.error = None;
     }
+    KeyCode::Char('r') => {
+      app.make_request();
+    }
     KeyCode::Esc => app.items.unselect(),
     KeyCode::Down | KeyCode::Char('j') => {
       app.items.next();
