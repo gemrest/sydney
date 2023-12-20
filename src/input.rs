@@ -27,7 +27,7 @@ pub enum Mode {
 }
 
 fn handle_input_response(
-  mut app: &mut crate::App,
+  app: &mut crate::App,
   key: crossterm::event::KeyEvent,
 ) -> bool {
   match key.code {
@@ -79,7 +79,7 @@ fn handle_input_response(
 }
 
 fn handle_normal_input(
-  mut app: &mut crate::App,
+  app: &mut crate::App,
   key: crossterm::event::KeyEvent,
 ) -> bool {
   match key.code {
@@ -116,13 +116,14 @@ fn handle_normal_input(
       }
     }
     KeyCode::Char('G') => app.items.last(),
-    KeyCode::Char('g') =>
+    KeyCode::Char('g') => {
       if app.command_stroke_history.contains(&key.code) {
         app.items.first();
         app.command_stroke_history.clear();
       } else if app.command_stroke_history.is_empty() {
         app.command_stroke_history.push(key.code);
-      },
+      }
+    }
     KeyCode::Backspace => app.error = None,
     KeyCode::Enter => {
       app.error = None;
@@ -163,7 +164,7 @@ fn handle_normal_input(
 }
 
 fn handle_editing_input(
-  mut app: &mut crate::App,
+  app: &mut crate::App,
   key: crossterm::event::KeyEvent,
 ) -> bool {
   match key.code {
@@ -174,7 +175,7 @@ fn handle_editing_input(
 
       match Command::from(app.input.to_string()) {
         Command::Quit => return true,
-        Command::Open(to) =>
+        Command::Open(to) => {
           if let Some(to) = to {
             match Url::parse(&crate::url::prefix_gemini(&to)) {
               Ok(url) => {
@@ -185,11 +186,12 @@ fn handle_editing_input(
             }
           } else {
             app.error = Some("No URL provided for open command".to_string());
-          },
+          }
+        }
         Command::Unknown => {
           app.error = Some(format!("\"{}\" is not a valid command", app.input));
         }
-        Command::Wrap(at, error) =>
+        Command::Wrap(at, error) => {
           if let Some(error) = error {
             app.error = Some(error);
           } else {
@@ -197,7 +199,8 @@ fn handle_editing_input(
             app.wrap_at = at;
 
             app.make_request();
-          },
+          }
+        }
         Command::Help => {
           app.set_url(
             Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap(),
@@ -259,12 +262,13 @@ pub fn handle_key_strokes(
   key: crossterm::event::KeyEvent,
 ) -> bool {
   match app.input_mode {
-    Mode::Normal =>
+    Mode::Normal => {
       if app.accept_response_input {
         handle_input_response(app, key)
       } else {
         handle_normal_input(app, key)
-      },
+      }
+    }
     Mode::Editing => handle_editing_input(app, key),
   }
 }
