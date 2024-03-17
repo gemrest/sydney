@@ -117,7 +117,7 @@ Report bugs to https://github.com/gemrest/sydney/issues"#,
   )?;
 
   let mut terminal =
-    tui::Terminal::new(tui::backend::CrosstermBackend::new(stdout))?;
+    ratatui::Terminal::new(ratatui::backend::CrosstermBackend::new(stdout))?;
   let result =
     App::run(&mut terminal, app, std::time::Duration::from_millis(250));
 

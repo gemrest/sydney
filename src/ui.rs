@@ -16,19 +16,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use germ::ast::Node;
-use tui::{
+use ratatui::{
   layout::{Constraint, Direction, Layout, Rect},
   style::{Color, Modifier, Style},
-  text::{Span, Spans},
+  text::{Line, Span},
   widgets,
   widgets::{ListItem, Paragraph},
 };
 
 #[allow(clippy::too_many_lines)]
-pub fn ui<B: tui::backend::Backend>(
-  f: &mut tui::Frame<'_, B>,
-  app: &mut crate::App,
-) {
+pub fn ui(f: &mut ratatui::Frame<'_>, app: &mut crate::App) {
   let chunks = Layout::default()
     .direction(Direction::Vertical)
     .constraints(
@@ -46,7 +43,7 @@ pub fn ui<B: tui::backend::Backend>(
     .items
     .iter()
     .map(|(text_lines, _link, pre)| {
-      let mut spans = vec![];
+      let mut lines = vec![];
 
       for line in text_lines {
         let mut line = line.clone();
@@ -55,13 +52,13 @@ pub fn ui<B: tui::backend::Backend>(
           if let Node::Text(text) = line {
             line = Node::PreformattedText {
               alt_text: None,
-              text:     text.to_string(),
+              text: text.to_string(),
             }
           }
         }
 
         macro_rules! wrap_split {
-          ($text:ident, $spans:ident) => {
+          ($text:ident, $lines:ident) => {
             let wrappeds = $text
               .as_bytes()
               .chunks((app.wrap_at as usize) - 5)
@@ -72,7 +69,7 @@ pub fn ui<B: tui::backend::Backend>(
               .collect::<Vec<_>>();
 
             for (i, wrapped) in wrappeds.iter().enumerate() {
-              $spans.push(Spans::from(format!("    {}{}", wrapped, {
+              $lines.push(Line::from(format!("    {}{}", wrapped, {
                 if i < wrappeds.len() - 1 && wrappeds.len() != 1 {
                   "-"
                 } else {
@@ -84,10 +81,11 @@ pub fn ui<B: tui::backend::Backend>(
         }
 
         match line {
-          germ::ast::Node::Text(text) =>
+          germ::ast::Node::Text(text) => {
             if text != "sydney_abc_123" {
-              wrap_split!(text, spans);
-            },
+              wrap_split!(text, lines);
+            }
+          }
           germ::ast::Node::Blockquote(text) => {
             let wrappeds = text
               .as_bytes()
@@ -99,7 +97,7 @@ pub fn ui<B: tui::backend::Backend>(
               .collect::<Vec<_>>();
 
             for (i, wrapped) in wrappeds.iter().enumerate() {
-              spans.push(Spans::from(vec![
+              lines.push(Line::from(vec![
                 Span::styled("  > ", Style::default().fg(Color::LightBlue)),
                 Span::styled(
                   format!("{}{}", wrapped.clone(), {
@@ -114,10 +112,7 @@ pub fn ui<B: tui::backend::Backend>(
               ]));
             }
           }
-          germ::ast::Node::Link {
-            to,
-            text,
-          } => {
+          germ::ast::Node::Link { to, text } => {
             let mut span_list =
               vec![Span::styled(" => ", Style::default().fg(Color::LightBlue))];
 
@@ -129,13 +124,10 @@ pub fn ui<B: tui::backend::Backend>(
             span_list
               .push(Span::styled(to, Style::default().fg(Color::LightBlue)));
 
-            spans.push(Spans::from(span_list));
+            lines.push(Line::from(span_list));
           }
-          germ::ast::Node::Heading {
-            text,
-            level,
-          } => {
-            spans.push(Spans::from(vec![
+          germ::ast::Node::Heading { text, level } => {
+            lines.push(Line::from(vec![
               Span::styled(
                 match level {
                   1 => "  # ",
@@ -173,12 +165,9 @@ pub fn ui<B: tui::backend::Backend>(
               span_list.push(Span::from(format!("{}\n", list_item)));
             }
 
-            spans.push(Spans::from(span_list));
+            lines.push(Line::from(span_list));
           }
-          germ::ast::Node::PreformattedText {
-            text,
-            alt_text,
-          } => {
+          germ::ast::Node::PreformattedText { text, alt_text } => {
             let mut span_list = vec![
               Span::styled("``` ", Style::default().fg(Color::LightBlue)),
               Span::from(alt_text.unwrap_or_else(|| "".to_string())),
@@ -188,15 +177,15 @@ pub fn ui<B: tui::backend::Backend>(
               span_list.push(Span::from(text));
             }
 
-            spans.push(Spans::from(span_list));
+            lines.push(Line::from(span_list));
           }
           germ::ast::Node::Whitespace => {
-            spans.push(Spans::from("".to_string()));
+            lines.push(Line::from("".to_string()));
           }
         };
       }
 
-      ListItem::new(spans)
+      ListItem::new(lines)
     })
     .collect();
 
@@ -241,9 +230,7 @@ pub fn ui<B: tui::backend::Backend>(
         app.response_input_text.trim(),
         app.response_input
       ))
-      .wrap(widgets::Wrap {
-        trim: false
-      }),
+      .wrap(widgets::Wrap { trim: false }),
       block.inner(area),
     );
   }
@@ -258,9 +245,7 @@ pub fn ui<B: tui::backend::Backend>(
     f.render_widget(widgets::Clear, area);
     f.render_widget(block.clone(), area);
     f.render_widget(
-      Paragraph::new(error.to_string()).wrap(widgets::Wrap {
-        trim: false
-      }),
+      Paragraph::new(error.to_string()).wrap(widgets::Wrap { trim: false }),
       block.inner(area),
     );
   }
