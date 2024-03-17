@@ -182,8 +182,8 @@ impl App {
     });
   }
 
-  pub fn run<B: tui::backend::Backend>(
-    terminal: &mut tui::Terminal<B>,
+  pub fn run<B: ratatui::backend::Backend>(
+    terminal: &mut ratatui::Terminal<B>,
     mut app: Self,
     tick_rate: Duration,
   ) -> std::io::Result<()> {

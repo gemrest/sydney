@@ -17,7 +17,7 @@
 
 //! <https://github.com/fdehau/tui-rs/blob/master/examples/list.rs>
 
-use tui::widgets::ListState;
+use ratatui::widgets::ListState;
 
 pub struct StatefulList<T> {
   pub state:    ListState,

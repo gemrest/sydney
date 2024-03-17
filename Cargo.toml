@@ -21,5 +21,5 @@ opt-level = 3
 [dependencies]
 germ = { version = "0.3.7", default-features = false, features = ["request", "ast"] } # Gemini
 url = "2.2.2" # URL
-tui = "0.18.0" # Terminal User Interface
-crossterm = "0.24.0" # Cross-platform Terminal
+ratatui = "0.25.0" # Terminal User Interface
+crossterm = "0.27.0" # Cross-platform Terminal
