@@ -33,7 +33,8 @@ Options:
     --help, -h       show help text
 
 Sample invocations:
-    syndey gemini://gem.rest/
+    syndey gemini://fuwn.me/
+    syndey fuwn.me
     syndey --help
 
 Report bugs to https://github.com/gemrest/sydney/issues

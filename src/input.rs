@@ -203,7 +203,7 @@ fn handle_editing_input(
         }
         Command::Help => {
           app.set_url(
-            Url::parse("gemini://gem.rest/projects/sydney.gmi").unwrap(),
+            Url::parse("gemini://fuwn.me/blog/technology/gemini?referrer=sydney").unwrap(),
           );
           app.make_request();
         }

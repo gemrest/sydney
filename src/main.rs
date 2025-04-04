@@ -58,7 +58,8 @@ Options:
     --help, -h       show help text
 
 Sample invocations:
-    {0} gemini://gem.rest/
+    {0} gemini://fuwn.me/
+    {0} fuwn.me
     {0} --help
 
 Report bugs to https://github.com/gemrest/sydney/issues"#,
